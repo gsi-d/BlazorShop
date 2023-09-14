@@ -1,0 +1,33 @@
+﻿@page "/produtos"
+@inject IProdutoService produtoService
+
+@if (Produtos == null)
+{
+    <h3>Carregando produtos...</h3>
+}
+else
+{
+    <h3 class="mb-5">Produtos</h3>
+    @if (Produtos.Count() > 0)
+    {
+        @foreach (var prodGroup in Produtos)
+        {
+            <h4>@prodGroup.FirstOrDefault(x => x.CategoriaId == prodGroup.Key).CategoriaNome</h4>
+            <div class="row mt-3">
+                <ExibirProdutos Produtos="@prodGroup"></ExibirProdutos>
+            </div>
+        }
+    }
+}
+
+@code {
+
+    public List<IGrouping<int, ProdutoDTO>>? Produtos { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await produtoService.GetItens();
+        Produtos = response.GroupBy(x => x.CategoriaId).OrderBy(x => x.Key).ToList();
+    }
+
+}
