@@ -72,7 +72,7 @@ else
         try
         {
             CarrinhoCompraItens = await CarrinhoCompraService.GetItens(UsuarioLogado.UsuarioId);
-            CalculaResumoCarrinhoTotal();
+            CarrinhoChanged();
         }
         catch (Exception ex)
         {
@@ -84,7 +84,7 @@ else
     {
         var carrinhoItemDTO = await CarrinhoCompraService.DeletaItem(id);
         await RemoveCarrinhoItem(id);
-        CalculaResumoCarrinhoTotal();
+        CarrinhoChanged();
     }
 
     private CarrinhoItemDTO GetCarrinhoItem(int id)
@@ -112,7 +112,7 @@ else
                 var itemAtualizado = await CarrinhoCompraService.AtualizaQuantidade(atualizaItemDTO);
 
                 AtualizaPrecoItem(itemAtualizado);
-                CalculaResumoCarrinhoTotal();
+                CarrinhoChanged();
                 await _js.InvokeVoidAsync("TornaBotaoAtualizarQuantidadeVisivel", id, true);
             }
             else
@@ -157,5 +157,11 @@ else
     protected async Task AtualizaQuantidadeInput(int id)
     {
         await _js.InvokeVoidAsync("TornaBotaoAtualizarQuantidadeVisivel", id, true);
+    }
+
+    private void CarrinhoChanged()
+    {
+        CalculaResumoCarrinhoTotal();
+        CarrinhoCompraService.RaiseEventOnCarrinhoCompraChanged(QuantidadeTotal);
     }
 }
