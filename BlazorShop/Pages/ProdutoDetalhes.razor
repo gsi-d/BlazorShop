@@ -24,7 +24,8 @@ else
                 </b>
             </p>
             <div>
-                <button class="btn btn-success">
+                <button class="btn btn-success"
+                @onclick="() => AdicionarAoCarrinho()">
                 
                     Incluir no Carrinho
                 </button>
@@ -37,6 +38,10 @@ else
 @code {
     [Inject]
     public IProdutoService? ProdutoService { get; set; }
+
+    [Inject]
+    public ICarrinhoCompraService? CarrinhoCompraService { get; set; }
+
     [Parameter]
     public int Id { get; set; }
     public ProdutoDTO? Produto { get; set; }
@@ -51,6 +56,25 @@ else
         catch(Exception ex)
         {
             MensagemErro = ex.Message;
+        }
+    }
+
+    protected async Task AdicionarAoCarrinho()
+    {
+        try
+        {
+            var carrinhoItemAdicionaDTO = new CarrinhoItemAdicionaDTO()
+            {
+                CarrinhoId = UsuarioLogado.CarrinhoId,
+                ProdutoId = Produto.Id,
+                Quantidade = 1
+            };
+
+            var carrinhoItemDTO = await CarrinhoCompraService.AdicionaItem(carrinhoItemAdicionaDTO);
+        }
+        catch (Exception)
+        {
+            throw;
         }
     }
 }
