@@ -71,6 +71,7 @@ else
             };
 
             var carrinhoItemDTO = await CarrinhoCompraService.AdicionaItem(carrinhoItemAdicionaDTO);
+            _navigationManager.NavigateTo("/CarrinhoCompra");
         }
         catch (Exception)
         {

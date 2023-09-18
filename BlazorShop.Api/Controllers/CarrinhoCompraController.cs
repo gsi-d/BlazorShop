@@ -31,15 +31,11 @@ namespace BlazorShop.Api.Controllers
             {
                 var carrinhoItens = await carrinhoCompraRepository.GetItens(usuarioId);
                 if (carrinhoItens == null)
-                {
                     return NoContent();
-                }
 
                 var produtos = await produtoRepository.GetItens();
                 if (produtos == null)
-                {
                     throw new Exception("Não existem produtos...");
-                }
 
                 var carrinhoItensDTO = carrinhoItens.CarrinhoItensToDTO(produtos);
                 return Ok(carrinhoItensDTO);
@@ -59,15 +55,11 @@ namespace BlazorShop.Api.Controllers
             {
                 var carrinhoItem = await carrinhoCompraRepository.GetItem(id);
                 if (carrinhoItem == null)
-                {
                     return NotFound("item não encontrado"); //404 status code
-                }
 
                 var produto = await produtoRepository.GetItem(carrinhoItem.ProdutoId);
                 if (produto == null)
-                {
                     return NotFound("item não existe na fonte de dados");
-                }
 
                 var carrinhoItemDTO = carrinhoItem.CarrinhoItemToDTO(produto);
                 return Ok(carrinhoItemDTO);
@@ -86,15 +78,11 @@ namespace BlazorShop.Api.Controllers
             {
                 var novoCarrinhoItem = await carrinhoCompraRepository.AdicionaItem(carrinhoItemAdicionaDTO);
                 if(novoCarrinhoItem == null)
-                {
                     return NoContent(); //Status 204
-                }
 
                 var produto = await produtoRepository.GetItem(novoCarrinhoItem.ProdutoId);
                 if(produto == null)
-                {
                     throw new Exception($"Produto não localizado (Id:{carrinhoItemAdicionaDTO.ProdutoId})");
-                }
 
                 var novoCarrinhoItemDTO = novoCarrinhoItem.CarrinhoItemToDTO(produto);
 
@@ -103,6 +91,28 @@ namespace BlazorShop.Api.Controllers
             catch (Exception ex)
             {
                 logger.LogError($"## Erro ao criar um novo item no carrinho");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<CarrinhoItemDTO>> DeleteItem(int id)
+        {
+            try
+            {
+                var carrinhoItem = await carrinhoCompraRepository.DeletaItem(id);
+
+                if(carrinhoItem == null)
+                    return NotFound();
+
+                var produto = await produtoRepository.GetItem(carrinhoItem.ProdutoId);
+                if (produto is null)
+                    return NotFound();
+                var carrinhoItemDTO = carrinhoItem.CarrinhoItemToDTO(produto);
+                return Ok(carrinhoItemDTO);
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
