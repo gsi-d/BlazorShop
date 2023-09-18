@@ -1,5 +1,7 @@
 ﻿using BlazorShop.Models.DTOs;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 
 namespace BlazorShop.Web.Services
 {
@@ -77,6 +79,26 @@ namespace BlazorShop.Web.Services
                 return default(CarrinhoItemDTO);
             }
             catch(Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<CarrinhoItemDTO> AtualizaQuantidade(CarrinhoItemAtualizaQuantidadeDTO itemAtualizaQuantidadeDTO)
+        {
+            try
+            {
+                var jsonRequest = JsonSerializer.Serialize(itemAtualizaQuantidadeDTO);
+
+                var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json-patch+json");
+
+                var response = await _httpClient.PatchAsync($"api/CarrinhoCompra/{itemAtualizaQuantidadeDTO.CarrinhoItemId}", content);
+
+                if (response.IsSuccessStatusCode)
+                    return await response.Content.ReadFromJsonAsync<CarrinhoItemDTO>();
+                return null;
+            }
+            catch (Exception ex)
             {
                 throw;
             }
