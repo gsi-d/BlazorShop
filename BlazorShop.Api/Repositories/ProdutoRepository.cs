@@ -33,5 +33,11 @@ namespace BlazorShop.Api.Repositories
 
             return produto;
         }
+
+        public async Task<IEnumerable<Categoria>> GetCategorias()
+        {
+            var categorias = await _context.Categorias.ToListAsync();
+            return categorias;
+        }
     }
 }
