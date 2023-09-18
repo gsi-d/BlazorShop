@@ -8,5 +8,7 @@ namespace BlazorShop.Web.Services
         Task<CarrinhoItemDTO> AdicionaItem(CarrinhoItemAdicionaDTO carrinhoItemAdicionaDTO);
         Task<CarrinhoItemDTO> DeletaItem(int id);
         Task<CarrinhoItemDTO> AtualizaQuantidade(CarrinhoItemAtualizaQuantidadeDTO itemAtualizaQuantidadeDTO);
+        event Action<int> OnCarrinhoCompraChanged;
+        void RaiseEventOnCarrinhoCompraChanged(int totalQuantidade);
     }
 }

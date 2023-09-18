@@ -9,6 +9,8 @@ namespace BlazorShop.Web.Services
     {
         private readonly HttpClient _httpClient;
 
+        public event Action<int> OnCarrinhoCompraChanged;
+
         public CarrinhoCompraService(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -102,6 +104,12 @@ namespace BlazorShop.Web.Services
             {
                 throw;
             }
+        }
+
+        public void RaiseEventOnCarrinhoCompraChanged(int totalQuantidade)
+        {
+            if (OnCarrinhoCompraChanged != null)
+                OnCarrinhoCompraChanged.Invoke(totalQuantidade);
         }
     }
 }
