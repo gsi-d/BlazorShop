@@ -3,7 +3,7 @@ using BlazorShop.Models.DTOs;
 
 namespace BlazorShop.Api.Repositories
 {
-    public interface ICarrinhoRepository
+    public interface ICarrinhoCompraRepository
     {
         Task<CarrinhoItem> AdicionaItem(CarrinhoItemAdicionaDTO carrinhoItemAdicionaDTO);
         Task<CarrinhoItem> AtualizaQuantidade(int id, CarrinhoItemAtualizaQuantidadeDTO carrinhoItemAtualizaQtdDTO);
