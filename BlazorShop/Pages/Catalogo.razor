@@ -3,7 +3,7 @@
 
 @if (Produtos == null)
 {
-    <Spinner/>
+    <Spinner />
 }
 else
 {
@@ -23,19 +23,40 @@ else
 @code {
 
     public List<IGrouping<int, ProdutoDTO>>? Produtos { get; set; }
+    public string? MensagemErro { get; set; }
 
     [Inject]
     public ICarrinhoCompraService? CarrinhoCompraService { get; set; }
 
+    [Inject]
+    public IGerenciaProdutosLocalStorageService? GerenciaProdutosLocalStorageService { get; set; }
+    [Inject]
+    public IGerenciaCarrinhoItensLocalStorageService? GerenciaCarrinhoItensLocalStorageService { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        var response = await produtoService.GetItens();
-        Produtos = response.GroupBy(x => x.CategoriaId).OrderBy(x => x.Key).ToList();
+        try
+        {
+            await LimpaLocalStorage();
+            var response = await GerenciaProdutosLocalStorageService.GetCollection();
+            Produtos = response.GroupBy(x => x.CategoriaId).OrderBy(x => x.Key).ToList();
 
-        var carrinhoCompraItens = await CarrinhoCompraService.GetItens(UsuarioLogado.UsuarioId);
-        var totalQuantidade = carrinhoCompraItens.Sum(x => x.Quantidade);
+            var carrinhoCompraItens = await GerenciaCarrinhoItensLocalStorageService.GetCollection();
+            var totalQuantidade = carrinhoCompraItens.Sum(x => x.Quantidade);
 
-        CarrinhoCompraService.RaiseEventOnCarrinhoCompraChanged(totalQuantidade);
+            CarrinhoCompraService.RaiseEventOnCarrinhoCompraChanged(totalQuantidade);
+
+        }
+        catch (Exception ex)
+        {
+            MensagemErro = ex.Message;
+        }
+    }
+
+    private async Task LimpaLocalStorage()
+    {
+        await GerenciaProdutosLocalStorageService.RemoveCollection();
+        await GerenciaCarrinhoItensLocalStorageService.RemoveCollection();
     }
 
 }
